@@ -1,0 +1,51 @@
+.table{
+  font-family: 'Roboto', sans-serif;
+}
+
+
+
+.bblr{
+  border-bottom-left-radius: 1rem;
+}
+
+.bbrr{
+  border-bottom-right-radius: 1rem;
+}
+
+.name-column{
+  background-color: #1B1F23;
+  color: #FFF;
+  border-bottom: 3px solid #64676D;
+}
+
+.name-column.number{
+  border-top-left-radius: 1rem;
+}
+
+.name-column:last-child{
+  border-top-right-radius: 1rem;
+}
+
+.stock-row{
+  color: gray;
+}
+
+.stock-row:hover{
+  color: #1B1E22;
+}
+
+.profit{
+  color: green;
+}
+
+.loss{
+  color: red;
+}
+
+.even{
+  background-color: #FFFFFF;
+}
+
+.odd{
+  background-color: #EBEBEB;
+}

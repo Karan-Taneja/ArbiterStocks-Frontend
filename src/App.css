@@ -1,0 +1,17 @@
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  background-color: #2D3446;
+}
+
+.container {
+  height: calc(100% - 108px)
+}
+
+.portfolio, .transactions {
+  height: 100%;
+}
+
+label{
+  font-weight: 600;
+}
