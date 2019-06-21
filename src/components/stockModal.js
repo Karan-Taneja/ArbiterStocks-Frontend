@@ -230,7 +230,7 @@ class StockModal extends Component {
       </div>
     </div>);
 
-    const displaySuccess = (err === '' ?
+    const displaySuccess = (success === '' ?
     <div style={{height: '4em'}}></div> 
     : 
     <div className="d-flex justify-content-center mx-n3" style={{height: '4em', marginBottom: 'none'}}>
@@ -312,12 +312,3 @@ class StockModal extends Component {
 };
 
 export default StockModal;
-
-/*
-
-  TODO:
-
-    1. Create transparent black backdrop
-    2. Figure out how to center position absolute
-    3. Implement the rest LOL
-*/
