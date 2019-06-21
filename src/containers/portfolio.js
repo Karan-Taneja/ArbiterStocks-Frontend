@@ -53,11 +53,11 @@ export default class Portfolio extends React.Component {
 
   getUserPortfolio = async (user_id) => {
     try {
-      const res = await axios.get(`http://arbiter-stocks.herokuapp.com/portfolios/?user_id=${user_id}`)
+      const res = await axios.get(`https://arbiter-stocks.herokuapp.com/portfolios/?user_id=${user_id}`)
       const { portfolio } = res.data;
       if(portfolio.length > 0){
         for(let item of portfolio){
-          const nextRes = await axios.get(`http://arbiter-stocks.herokuapp.com/stocks/id/${item.stock_id}`)
+          const nextRes = await axios.get(`https://arbiter-stocks.herokuapp.com/stocks/id/${item.stock_id}`)
           let { stock } = nextRes.data;
           const price = await iexReqs.getStockPrice(stock.symbol);
           item.symbol = stock.symbol;

@@ -27,7 +27,7 @@ export default class Signup extends React.Component {
       firebase.auth().createUserWithEmailAndPassword(email, password)
         .then(async (response) => {
           console.log('Returns: ', response);
-          axios.post(`http://arbiter-stocks.herokuapp.com/users/`, {
+          axios.post(`https://arbiter-stocks.herokuapp.com/users/`, {
             email: `${email}`
           });
         })

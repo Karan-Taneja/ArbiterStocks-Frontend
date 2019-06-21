@@ -31,11 +31,11 @@ export default class Transactions extends React.Component {
 
   getUserTransactions = async (user_id) => {
     try {
-      const res = await axios.get(`http://arbiter-stocks.herokuapp.com/transactions/?user_id=${user_id}`)
+      const res = await axios.get(`https://arbiter-stocks.herokuapp.com/transactions/?user_id=${user_id}`)
       const { transactions } = res.data;
       if(transactions.length > 0){
         for(let i = 0; i < transactions.length; i++){
-          const nextRes = await axios.get(`http://arbiter-stocks.herokuapp.com/stocks/id/${transactions[i].stock_id}`)
+          const nextRes = await axios.get(`https://arbiter-stocks.herokuapp.com/stocks/id/${transactions[i].stock_id}`)
           let { stock } = nextRes.data;
           transactions[i].symbol = stock.symbol;
           transactions[i].company = stock.company;

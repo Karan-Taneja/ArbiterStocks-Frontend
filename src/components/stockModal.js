@@ -129,7 +129,7 @@ class StockModal extends Component {
       }
 
       try{
-        await axios.post(`http://arbiter-stocks.herokuapp.com/transactions/?user_id=${user.id}`, {
+        await axios.post(`https://arbiter-stocks.herokuapp.com/transactions/?user_id=${user.id}`, {
           'stock_id': stocks[symbol].id,
           'quantity': quantity,
           'price_per_stock': price,
@@ -137,7 +137,7 @@ class StockModal extends Component {
         console.log('1')
         if(owned){
           const sum = quantity+equity;
-          await axios.put(`http://arbiter-stocks.herokuapp.com/portfolios/`, {
+          await axios.put(`https://arbiter-stocks.herokuapp.com/portfolios/`, {
             'user_id': user.id,
             'stock_id': stocks[symbol].id,
             'quantity': sum,
@@ -145,14 +145,14 @@ class StockModal extends Component {
           console.log('2');
         }
         else{
-          await axios.post(`http://arbiter-stocks.herokuapp.com/portfolios/`, {
+          await axios.post(`https://arbiter-stocks.herokuapp.com/portfolios/`, {
             'user_id': user.id,
             'stock_id': stocks[symbol].id,
             'quantity': quantity,
           });
           console.log('3')
         }
-        await axios.put(`http://arbiter-stocks.herokuapp.com/users/?email=${user.email}`, {
+        await axios.put(`https://arbiter-stocks.herokuapp.com/users/?email=${user.email}`, {
           'funds': funds
         });
         console.log('4')
@@ -178,7 +178,7 @@ class StockModal extends Component {
   getUserInformation = async () => {
     const { user } = this.state;
     if(!user || !user.email) return;
-    const res = await axios.get(`http://arbiter-stocks.herokuapp.com/users/?email=${user.email}`);
+    const res = await axios.get(`https://arbiter-stocks.herokuapp.com/users/?email=${user.email}`);
     user.id = res.data.user.id;
     user.funds = res.data.user.funds;
     this.context.update(user);

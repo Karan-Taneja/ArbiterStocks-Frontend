@@ -26,7 +26,7 @@ class Navbar extends Component {
 
   getUserInformation = async () => {
     const { user } = this.state;
-    const res = await axios.get(`http://arbiter-stocks.herokuapp.com/users/?email=${user.email}`);
+    const res = await axios.get(`https://arbiter-stocks.herokuapp.com/users/?email=${user.email}`);
     user.id = res.data.user.id;
     user.funds = res.data.user.funds;
     this.context.update(user);
