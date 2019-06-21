@@ -43,6 +43,9 @@ export default class Transactions extends React.Component {
         };
         this.setState({ transactions: transactions, loading: false });
       }
+      else {
+        this.setState({ transactions : [], loading: false});
+      }
     }
     catch(err) {
       console.log('err', err);
