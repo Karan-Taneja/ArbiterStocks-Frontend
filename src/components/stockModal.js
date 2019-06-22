@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
+// ---- Components
+import Loading from './loading';
+
 // ---- Contexts
 import AuthContext from '../contexts/auth';
 
@@ -33,6 +36,7 @@ class StockModal extends Component {
     total: null,
     err: '',
     success: '',
+    loading: false,
   };
 
   getStockPrice = async () => {
@@ -41,7 +45,15 @@ class StockModal extends Component {
       const initialRes = await iexReqs.getStockPrice(symbol);
       const open_price = stocks[symbol].open_price;
       const currency = stocks[symbol].currency;
-      this.setState({price: initialRes.data, displayList: [], open_price, currency, err:'', success: ''})
+      this.setState({
+        price: initialRes.data, 
+        displayList: [], 
+        open_price, 
+        currency, 
+        err:'', 
+        success: '',
+        loading: false,
+      })
     }
     catch(err){
       console.log(err);
@@ -49,7 +61,7 @@ class StockModal extends Component {
     this.pingStockPrice = setInterval(async () => {
       try {
         const res = await iexReqs.getStockPrice(symbol);
-        this.setState({price: res.data, err: '', success: ''})
+        this.setState({price: res.data, err: '', success: '', loading: false})
       }
       catch(err) {
         console.log(err)
@@ -59,10 +71,14 @@ class StockModal extends Component {
 
   handleSymbolSubmit = (e) => {
     e.preventDefault();
+    this.setState({loading: true})
     const { symbol, stocks } = this.state;
     const pass = stocks[symbol];
     if(pass) this.getStockPrice();
-    else return;
+    else this.setState({
+      err: 'The selected symbol is invalid.',
+      loading: false,
+    });
   };
 
   handleChange = (e) => {
@@ -76,9 +92,9 @@ class StockModal extends Component {
         if(stock[0] !== value[0] || displayList.length >= 3) break;
         else if(stock.indexOf(value) === 0) displayList.push(stock);
       };
-      this.setState({[name]: value, displayList, err: '', success: ''});
+      this.setState({[name]: value, displayList, err: '', success: '', loading: false});
     }
-    else this.setState({[name]: e.target.value, err: '', success: ''});
+    else this.setState({[name]: e.target.value, err: '', success: '', loading: false});
   };
 
   handleQuantity = (e) => {
@@ -87,12 +103,12 @@ class StockModal extends Component {
     if(value < 0) return;
     if(isNaN(value)) {
       value = '';
-      this.setState({'quantity': value, total: 0});
+      this.setState({'quantity': value, total: 0, loading: false,});
     }
     else {
       const { price } = this.state;
       const nuTotal =  value * price;
-      this.setState({'quantity':value, 'total': nuTotal, err: '', success: ''});
+      this.setState({'quantity':value, 'total': nuTotal, err: '', success: '', loading: false});
     };
   }
 
@@ -100,15 +116,15 @@ class StockModal extends Component {
     e.preventDefault();
     const symbol = e.target.getAttribute('value');
     const displayList = [];
-    this.setState({symbol, displayList, err: '', success: ''});
+    this.setState({symbol, displayList, err: '', success: '', loading: false});
   };
-
 
   handlePurchase = async (e) => {
     e.preventDefault();
+    this.setState({loading: true});
     const { user, quantity, stocks, price, total, symbol, portfolio } = this.state;
     if(user.funds < total) {
-      this.setState({'err': 'Insufficient funds'})
+      this.setState({'err': 'Insufficient funds', loading: false})
       return;
     }
     else if(quantity === 0) return;
@@ -120,74 +136,66 @@ class StockModal extends Component {
         if(item.symbol === symbol) {
           owned = true;
           equity = item.quantity; 
-          console.log(equity)
           break;
         };
       };
       if(!user.id || !quantity || !price || !stocks[symbol].id || funds == null){
         this.setState({'err': 'An error occured. Please try again.'})
       }
-
-      try{
-        await axios.post(`https://arbiter-stocks.herokuapp.com/transactions/?user_id=${user.id}`, {
-          'stock_id': stocks[symbol].id,
-          'quantity': quantity,
-          'price_per_stock': price,
-        });
-        console.log('1')
-        if(owned){
-          const sum = quantity+equity;
-          await axios.put(`https://arbiter-stocks.herokuapp.com/portfolios/`, {
-            'user_id': user.id,
-            'stock_id': stocks[symbol].id,
-            'quantity': sum,
-          });
-          console.log('2');
-        }
-        else{
-          await axios.post(`https://arbiter-stocks.herokuapp.com/portfolios/`, {
-            'user_id': user.id,
+      else {    
+        try{
+          await axios.post(`https://arbiter-stocks.herokuapp.com/transactions/?user_id=${user.id}`, {
             'stock_id': stocks[symbol].id,
             'quantity': quantity,
+            'price_per_stock': price,
           });
-          console.log('3')
+          if(owned){
+            const sum = quantity+equity;
+            await axios.put(`https://arbiter-stocks.herokuapp.com/portfolios/`, {
+              'user_id': user.id,
+              'stock_id': stocks[symbol].id,
+              'quantity': sum,
+            });;
+          }
+          else{
+            await axios.post(`https://arbiter-stocks.herokuapp.com/portfolios/`, {
+              'user_id': user.id,
+              'stock_id': stocks[symbol].id,
+              'quantity': quantity,
+            });
+          }
+          await axios.put(`https://arbiter-stocks.herokuapp.com/users/?email=${user.email}`, {
+            'funds': funds
+          });
         }
-        await axios.put(`https://arbiter-stocks.herokuapp.com/users/?email=${user.email}`, {
-          'funds': funds
+        catch(err) {
+          console.log(err);
+          this.setState({err: 'An error occured. Please try again.', loading: false});
+          return;
+        };
+        user.funds = funds;
+        clearInterval(this.pingStockPrice);
+        this.setState({
+          user: user,
+          success: 'Transaction successfully completed.', 
+          err: '',
+          loading: false,
         });
-        console.log('4')
-      }
-      catch(err) {
-        console.log(err);
       };
-      console.log('end')
-      user.funds = funds;
-      this.setState({
-        price: null, 
-        open_price: null, 
-        total: null, 
-        currency: null,
-        user: user,
-        success: 'Transaction successfully completed.', 
-        err: '',
-      });
-      this.context.update({user});
     };
   };
 
-  getUserInformation = async () => {
-    const { user } = this.state;
+  getUserInformation = async (user) => {
     if(!user || !user.email) return;
     const res = await axios.get(`https://arbiter-stocks.herokuapp.com/users/?email=${user.email}`);
     user.id = res.data.user.id;
     user.funds = res.data.user.funds;
-    this.context.update(user);
   };
 
   componentDidMount(){
     const user = this.context.user;
     if(user && !user.funds){
-      this.getUserInformation();
+      this.getUserInformation(user);
     };
   };
   
@@ -196,6 +204,7 @@ class StockModal extends Component {
   };
 
   handleReturn = () => {
+    clearInterval(this.pingStockPrice);
     this.setState({
       price: null, 
       open_price: null, 
@@ -204,11 +213,13 @@ class StockModal extends Component {
       success: '',
       symbol: '',
       err: '',
+      loading: false,
     });
   };
 
   render(){
-    const { user, symbol, displayList, stocks, quantity, currency, open_price, price, total, err, success } = this.state;
+    const { user, symbol, displayList, stocks, quantity, loading,
+            currency, open_price, price, total, err, success } = this.state;
     let f_open_price, f_price, f_total, f_funds;
     if(user){
       if(currency && price && open_price){
@@ -254,7 +265,7 @@ class StockModal extends Component {
             :
             <h1 className="modalHeader col-12 text-center pt-2">{stocks[symbol].company} Stock</h1>
           }
-          { success === '' ? displayError : displaySuccess }
+          { loading ? <Loading /> : success === '' ? displayError : displaySuccess }
           {
             !this.state.price ?
             <>
@@ -302,7 +313,7 @@ class StockModal extends Component {
                 <img src={Back} alt="Back" style={{color: 'blue', width:'3rem','height':'3rem'}} onClick={this.handleReturn}/>
                 <button className="btn btn-primary" onClick={this.handlePurchase}>Purchase</button>
               </div> 
-            </div>
+            </div> 
           }
         </form>
       </div>

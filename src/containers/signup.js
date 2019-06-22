@@ -4,16 +4,22 @@ import axios from 'axios';
 import AuthContext from '../contexts/auth';
 import { Link, Redirect } from 'react-router-dom'
 
+// ---- Components
+import Loading from '../components/loading';
+
 // ---- CSS
 import './form.css';
 
 export default class Signup extends React.Component {
 
+  static contextType = AuthContext;
+
   state = {
     email: '',
     password: '',
     confirm: '',
-    error: ''
+    error: '',
+    loading: false,
   };
 
   handleChange = (e) => {
@@ -22,28 +28,31 @@ export default class Signup extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    this.setState({loading: true})
     const { email, password, confirm } = this.state;
     if(password === confirm){
-      firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(async (response) => {
-          console.log('Returns: ', response);
-          await axios.post(`https://arbiter-stocks.herokuapp.com/users/`, {
-            email: `${email}`
-          });
-        })
-        .catch(err => {
-          let { message } = err;
-          if(message === "The email address is badly formatted.") message = "Invalid email address.";
-          this.setState({ error: message });
-        });
+      axios.post(`https://arbiter-stocks.herokuapp.com/users/`, {
+        email: `${email}`
+      })
+      .then(() => {
+        return firebase.auth().createUserWithEmailAndPassword(email, password);
+      })
+      .then(() => {
+        this.setState({loading: false});
+      })
+      .catch(err => {
+        let { message } = err;
+        if(message === "The email address is badly formatted.") message = "Invalid email address.";
+        this.setState({ error: message, loading: false });
+      });
     }
     else{
-      this.setState({ error: 'The passwords do not match.'});
+      this.setState({ error: 'The passwords do not match.', loading: false});
     };
   };
 
   render() {
-    const { email, password, confirm, error } = this.state;
+    const { email, password, confirm, error, loading } = this.state;
     
     const displayError = error === '' ? 
     <div style={{height: '4em'}}></div> 
@@ -87,10 +96,9 @@ export default class Signup extends React.Component {
         {
           (context) => {
             if (context.user) {
-              console.log(context.user);
               return <Redirect to='/' />;
             } else {
-              return displayForm;
+              return loading ? <Loading /> :  displayForm;
             };
           }
         }

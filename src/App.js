@@ -42,17 +42,24 @@ export default class App extends Component {
           user.id = res.data.user.id;
           user.funds = res.data.user.funds;
           appCache.setItem('user', user);
-          this.setState({user, loading: false})
+          this.setState({user, loading: false});
           if(!this.state.stocks || Date.now() - this.state.stocks.updated * 1 > 43200000){
-            const stockRes = await axios.get(`https://arbiter-stocks.herokuapp.com/stocks/alldata`);
-            const stocks = stockRes.data.stocks;
-            stocks.update = Date.now()
-            appCache.setItem('stocks', stocks);
-            this.setState({stocks});
+            try{
+              const stockRes = await axios.get(`https://arbiter-stocks.herokuapp.com/stocks/alldata`);
+              const stocks = stockRes.data.stocks;
+              stocks.update = Date.now()
+              appCache.setItem('stocks', stocks);
+              this.setState({stocks});
+            }
+            catch(err) {
+              console.log(err)
+              this.setState({stocks: null});
+            };
           };
         }
         catch (err) {
           console.log(err);
+          this.setState({user: null, stocks: null, loading: false});
         };
       }
       else{
@@ -63,7 +70,9 @@ export default class App extends Component {
   };
 
   updateContext = (user) => {
-    this.setState({user});
+    this.setState({'user': user}, () => {
+      console.log(this.state.user);
+    });
   };
 
   componentWillUnmount() {
