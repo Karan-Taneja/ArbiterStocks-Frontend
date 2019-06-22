@@ -10,14 +10,12 @@ import format from '../scripts/format';
 
 // ---- CSS
 import './navbar.css';
-import axios from 'axios';
 
 // ---- Inline Styling
 const dark = { color: '#6C757D'};
 const underline = { color: '#FFF', borderBottom: '4px solid #3198F7'};
 
 class Navbar extends Component {
-
   render(){
     return (
       <AuthContext.Consumer>

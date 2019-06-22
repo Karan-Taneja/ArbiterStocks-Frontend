@@ -85,12 +85,13 @@ class StockModal extends Component {
     e.preventDefault();
     const name = e.target.name;
     const value = e.target.value.toUpperCase();
-    if(name === "symbol") {
+    if(value === '') this.setState({[name]: value, displayList:[]});
+    else if(name === "symbol") {
       const { stocks } = this.state;
       const displayList = [];
       for(let stock in stocks){
-        if(stock[0] !== value[0] || displayList.length >= 3) break;
-        else if(stock.indexOf(value) === 0) displayList.push(stock);
+        if(displayList.length >= 3) break;
+        if(stock.indexOf(value) === 0) displayList.push(stock);
       };
       this.setState({[name]: value, displayList, err: '', success: '', loading: false});
     }
