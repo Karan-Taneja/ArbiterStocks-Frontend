@@ -67,7 +67,7 @@ class StockModal extends Component {
       catch(err) {
         console.log(err)
       }
-    }, 60000);
+    }, 300000);
   };
 
   handleSymbolSubmit = (e) => {
