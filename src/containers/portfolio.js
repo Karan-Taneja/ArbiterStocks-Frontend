@@ -16,6 +16,7 @@ import AddButton from '../assets/add_button.svg';
 // ---- Scripts
 import appCache from '../scripts/cache';
 import iexReqs from '../scripts/iex';
+import myEnv from '../scripts/vars';
 
 // ---- CSS
 import './portfolio.css';
@@ -53,11 +54,11 @@ export default class Portfolio extends React.Component {
 
   getUserPortfolio = async (user_id) => {
     try {
-      const res = await axios.get(`https://arbiter-stocks.herokuapp.com/portfolios/?user_id=${user_id}`)
+      const res = await axios.get(`${myEnv.BASE_URL}/portfolios/?user_id=${user_id}`)
       const { portfolio } = res.data;
       if(portfolio.length > 0){
         for(let item of portfolio){
-          const nextRes = await axios.get(`https://arbiter-stocks.herokuapp.com/stocks/id/${item.stock_id}`)
+          const nextRes = await axios.get(`${myEnv.BASE_URL}/stocks/id/${item.stock_id}`)
           let { stock } = nextRes.data;
           const price = await iexReqs.getStockPrice(stock.symbol);
           item.symbol = stock.symbol;
@@ -77,6 +78,11 @@ export default class Portfolio extends React.Component {
     };
   };
 
+  updatePortfolio = () => {
+    const user_id = this.state.user.id;
+    this.getUserPortfolio(user_id);
+  };
+
   render() {
     const { portfolio, displayModal, loading } = this.state;
     return (
@@ -87,7 +93,7 @@ export default class Portfolio extends React.Component {
               if(loading) return <Loading />
               else return (<>
                 {
-                  displayModal ? <StockModal toggle={this.toggleModal} portfolio={portfolio}/> : <></>
+                  displayModal ? <StockModal toggle={this.toggleModal} updatePortfolio={this.updatePortfolio} portfolio={portfolio}/> : <></>
                 }
                 <div className="portfolio position-relative">
                   <PortfolioTable portfolio={portfolio} />

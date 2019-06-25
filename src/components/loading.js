@@ -5,7 +5,7 @@ import './loading.css';
 export default (props) => {
   return (<div className="loading-box">
     <div>
-      <img src={Loader} alt="loading..." style={{width:'200px','height':'auto'}}/>
+      <img src={Loader} alt="loading..." style={{width: props.width || '200px','height':'auto'}}/>
     </div>
   </div>);
 };

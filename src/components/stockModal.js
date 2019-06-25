@@ -11,6 +11,7 @@ import AuthContext from '../contexts/auth';
 import iexReqs from '../scripts/iex';
 import appCache from '../scripts/cache';
 import format from '../scripts/format';
+import myEnv from '../scripts/vars';
 
 // ---- Assets
 import Close from '../assets/close.svg';
@@ -145,27 +146,27 @@ class StockModal extends Component {
       }
       else {    
         try{
-          await axios.post(`https://arbiter-stocks.herokuapp.com/transactions/?user_id=${user.id}`, {
+          await axios.post(`${myEnv.BASE_URL}/transactions/?user_id=${user.id}`, {
             'stock_id': stocks[symbol].id,
             'quantity': quantity,
             'price_per_stock': price,
           });
           if(owned){
             const sum = quantity+equity;
-            await axios.put(`https://arbiter-stocks.herokuapp.com/portfolios/`, {
+            await axios.put(`${myEnv.BASE_URL}/portfolios/`, {
               'user_id': user.id,
               'stock_id': stocks[symbol].id,
               'quantity': sum,
             });;
           }
           else{
-            await axios.post(`https://arbiter-stocks.herokuapp.com/portfolios/`, {
+            await axios.post(`${myEnv.BASE_URL}/portfolios/`, {
               'user_id': user.id,
               'stock_id': stocks[symbol].id,
               'quantity': quantity,
             });
           }
-          await axios.put(`https://arbiter-stocks.herokuapp.com/users/?email=${user.email}`, {
+          await axios.put(`${myEnv.BASE_URL}/users/?email=${user.email}`, {
             'funds': funds
           });
         }
@@ -181,14 +182,14 @@ class StockModal extends Component {
           success: 'Transaction successfully completed.', 
           err: '',
           loading: false,
-        });
+        }, this.props.updatePortfolio(), this.context.update(user));
       };
     };
   };
 
   getUserInformation = async (user) => {
     if(!user || !user.email) return;
-    const res = await axios.get(`https://arbiter-stocks.herokuapp.com/users/?email=${user.email}`);
+    const res = await axios.get(`${myEnv.BASE_URL}/users/?email=${user.email}`);
     user.id = res.data.user.id;
     user.funds = res.data.user.funds;
   };

@@ -71,7 +71,12 @@ class Navbar extends Component {
                       </div> 
                       | 
                       <div className="pl-1">
-                        {format.returnFormatted('USD', context.user.funds)}
+                        {
+                          isNaN(context.user.funds) ?
+                          <>Loading...</>
+                          :
+                          format.returnFormatted('USD', context.user.funds)
+                        }
                       </div>
                       </>
                     :

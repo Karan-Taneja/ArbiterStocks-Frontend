@@ -23,6 +23,7 @@ import StockContext from './contexts/stock';
 
 // ---- Scripts
 import appCache from './scripts/cache';
+import myEnv from './scripts/vars';
 
 // ---- CSS
 import './App.css'
@@ -38,14 +39,14 @@ export default class App extends Component {
     this.unsubscribe = firebase.auth().onAuthStateChanged(async user => {
       if(user){
         try {
-          const res = await axios.get(`https://arbiter-stocks.herokuapp.com/users/?email=${user.email}`);
+          const res = await axios.get(`${myEnv.BASE_URL}/users/?email=${user.email}`);
           user.id = res.data.user.id;
           user.funds = res.data.user.funds;
           appCache.setItem('user', user);
           this.setState({user, loading: false});
           if(!this.state.stocks || Date.now() - this.state.stocks.updated * 1 > 43200000){
             try{
-              const stockRes = await axios.get(`https://arbiter-stocks.herokuapp.com/stocks/alldata`);
+              const stockRes = await axios.get(`${myEnv.BASE_URL}/stocks/alldata`);
               const stocks = stockRes.data.stocks;
               stocks.update = Date.now()
               appCache.setItem('stocks', stocks);

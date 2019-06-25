@@ -7,6 +7,9 @@ import { Link, Redirect } from 'react-router-dom'
 // ---- Components
 import Loading from '../components/loading';
 
+// ---- Scripts
+import myEnv from '../scripts/vars';
+
 // ---- CSS
 import './form.css';
 
@@ -31,7 +34,7 @@ export default class Signup extends React.Component {
     this.setState({loading: true})
     const { email, password, confirm } = this.state;
     if(password === confirm){
-      axios.post(`https://arbiter-stocks.herokuapp.com/users/`, {
+      axios.post(`${myEnv.BASE_URL}/users/`, {
         email: `${email}`
       })
       .then(() => {
