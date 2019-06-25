@@ -5,7 +5,7 @@ import axios from 'axios';
 // ---- Components
 import PortfolioTable from '../components/portfolioTable';
 import Loading from '../components/loading';
-import StockModal from '../components/stockModal';
+import PurchaseModal from '../components/purchaseModal';
 
 // ---- Contexts
 import AuthContext from '../contexts/auth';
@@ -30,6 +30,7 @@ export default class Portfolio extends React.Component {
     portfolio: appCache.getItem('portfolio') || [],
     displayModal: false,
     loading: true,
+    selling: false,
   };
 
   componentDidMount() {
@@ -79,6 +80,7 @@ export default class Portfolio extends React.Component {
   };
 
   updatePortfolio = () => {
+    this.setState({loading: true});
     const user_id = this.state.user.id;
     this.getUserPortfolio(user_id);
   };
@@ -90,10 +92,17 @@ export default class Portfolio extends React.Component {
         {
           context => {
             if(context.user){
-              if(loading) return <Loading />
+              if(loading) return (
+              <>
+                {
+                  displayModal ? <PurchaseModal toggle={this.toggleModal} updatePortfolio={this.updatePortfolio} portfolio={portfolio}/> : <></>
+                }
+                <Loading />
+              </>
+              )
               else return (<>
                 {
-                  displayModal ? <StockModal toggle={this.toggleModal} updatePortfolio={this.updatePortfolio} portfolio={portfolio}/> : <></>
+                  displayModal ? <PurchaseModal toggle={this.toggleModal} updatePortfolio={this.updatePortfolio} portfolio={portfolio}/> : <></>
                 }
                 <div className="portfolio position-relative">
                   <PortfolioTable portfolio={portfolio} />

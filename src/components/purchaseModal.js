@@ -18,9 +18,9 @@ import Close from '../assets/close.svg';
 import Back from '../assets/arrow_back.svg';
 
 // ---- CSS
-import './stockModal.css';
+import './purchaseModal.css';
 
-class StockModal extends Component {
+class PurchaseModal extends Component {
   
   static contextType = AuthContext;
 
@@ -325,4 +325,4 @@ class StockModal extends Component {
   };
 };
 
-export default StockModal;
+export default PurchaseModal;
