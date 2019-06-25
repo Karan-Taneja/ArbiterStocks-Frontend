@@ -150,6 +150,7 @@ class StockModal extends Component {
             'stock_id': stocks[symbol].id,
             'quantity': quantity,
             'price_per_stock': price,
+            'transaction_type': 'buy',
           });
           if(owned){
             const sum = quantity+equity;

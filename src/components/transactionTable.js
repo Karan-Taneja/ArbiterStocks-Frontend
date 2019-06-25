@@ -40,7 +40,9 @@ export default (props) => {
             <div className={`stock-column company col-2 text-left py-2 ${bg}`}>{e.company}</div>
             <div className={`stock-column amount col-1 text-left py-2 ${bg}`}>{e.quantity}</div>
             <div className={`stock-column perstock col-2 text-left py-2 ${bg}`}>{perstock}</div>
-            <div className={`stock-column total col-2 text-left py-2 ${bg}`}>{total}</div>
+            <div className={`stock-column total col-2 text-left py-2 ${bg}`}>
+              {e.transaction_type === 'buy' ? `-${total}`: `+${total}`}
+            </div>
             {
               i === transactions.length - 1 ?
               <div className={`stock-column date col-3 text-left py-2 bbrr ${bg}`}>{date}</div>
